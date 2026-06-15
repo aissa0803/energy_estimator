@@ -21,6 +21,14 @@ def estimate_energy(board, layer, in_dim, out_dim):
     Q21 = values[hi_x, lo_y]
     Q22 = values[hi_x, hi_y]
 
+    corners = torch.stack([Q11, Q12, Q21, Q22])
+    if torch.isnan(corners).any():
+        raise ValueError(
+            f"Energy table for {board}/{layer} has no measurements near "
+            f"in={float(in_dim.detach()):.0f}, out={float(out_dim.detach()):.0f}. "
+            f"Corner values: Q11={Q11:.4f}, Q12={Q12:.4f}, Q21={Q21:.4f}, Q22={Q22:.4f}."
+        )
+
     return (
         Q11 * (1 - tx) * (1 - ty)
         + Q12 * (1 - tx) * ty

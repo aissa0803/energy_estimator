@@ -39,5 +39,14 @@ def load_table(board_type: str, layer_type: str):
     grid_y = torch.tensor(df.columns.values, dtype=torch.float64)
     values = torch.tensor(df.values, dtype=torch.float64)
 
+    # Prepend 0 to both axes: 0 channels → 0 energy (physical anchor for pruned layers)
+    zero_col = torch.zeros(values.shape[0], 1, dtype=torch.float64)
+    values = torch.cat([zero_col, values], dim=1)
+    grid_y = torch.cat([torch.zeros(1, dtype=torch.float64), grid_y])
+
+    zero_row = torch.zeros(1, values.shape[1], dtype=torch.float64)
+    values = torch.cat([zero_row, values], dim=0)
+    grid_x = torch.cat([torch.zeros(1, dtype=torch.float64), grid_x])
+
     _TABLE_CACHE[key] = (grid_x, grid_y, values)
     return grid_x, grid_y, values

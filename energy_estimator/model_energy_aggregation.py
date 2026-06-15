@@ -34,11 +34,9 @@ def estimate_model_energy(model, board="CoralDevBoard", masks=None):
         else:
             continue
 
-        # prunning mask 
-        if name in masks:    
+        if name in masks:
             eff_out = masks[name].sum()
             masked = True
-            print(f"Layer {name} is masked. Effective output features: {eff_out}")
         else:
             eff_out = out_features
             masked = False
@@ -59,7 +57,7 @@ def estimate_model_energy(model, board="CoralDevBoard", masks=None):
         results["layers"][name] = {
             "type": type(module).__name__,
             "in": float(in_features),
-            "out": float(eff_out) if not isinstance(eff_out, torch.Tensor) else float(eff_out),
+            "out": eff_out.item() if isinstance(eff_out, torch.Tensor) else float(eff_out),
             "masked": masked,
             "energy": float(energy),
             "energy_mj": float(energy_mj),
