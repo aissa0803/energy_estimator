@@ -9,6 +9,15 @@ BASE_DIR = Path(__file__).parent / "data"
 
 
 def resolve_layer_key(module: nn.Module) -> str | None:
+    """Map a PyTorch module to its lookup-table key, or None if unsupported.
+
+    Args:
+        module: Any nn.Module instance.
+
+    Returns:
+        A string key such as "linear" or "conv_k3_p0", or None if the
+        module type has no corresponding energy table.
+    """
     if isinstance(module, nn.Linear):
         return "linear"
 
@@ -23,10 +32,19 @@ def resolve_layer_key(module: nn.Module) -> str | None:
 
 
 def list_boards() -> list[str]:
+    """Return the names of all available hardware boards."""
     return [d.name for d in BASE_DIR.iterdir() if d.is_dir()]
 
 
 def list_layer_keys(board: str) -> list[str]:
+    """Return the supported layer keys for a given board.
+
+    Args:
+        board: Hardware board name (e.g. "JetsonNano").
+
+    Returns:
+        Sorted list of layer keys (e.g. ["conv_k3_p0", "linear"]).
+    """
     board_dir = BASE_DIR / board
     return [
         f.stem.replace("_power_report", "")
@@ -35,10 +53,29 @@ def list_layer_keys(board: str) -> list[str]:
 
 
 def xlsx_path(board: str, layer_key: str) -> Path:
+    """Return the path to the Excel power report for a board/layer combination."""
     return BASE_DIR / board / f"{layer_key}_power_report.xlsx"
 
 
-def load_table(board: str, layer_key: str):
+def load_table(board: str, layer_key: str) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Load and cache the power lookup table for a board/layer pair.
+
+    Reads the Excel file once and caches the result in memory. The table is
+    augmented with a zero row and column so that 0 channels maps to 0 energy,
+    providing a physical anchor for fully-pruned layers.
+
+    Args:
+        board: Hardware board name (e.g. "JetsonNano").
+        layer_key: Layer key (e.g. "linear", "conv_k3_p0").
+
+    Returns:
+        grid_x: 1-D tensor of input dimension breakpoints.
+        grid_y: 1-D tensor of output dimension breakpoints.
+        values: 2-D tensor of measured energy values in Joules.
+
+    Raises:
+        FileNotFoundError: If no Excel file exists for the given board/layer.
+    """
     key = (board, layer_key)
 
     if key in _TABLE_CACHE:

@@ -15,4 +15,12 @@ venv/
 
 #Model weights
 *.pkl
-*.pth 
+*.pth
+
+#Jupyter Notebooks
+*.ipynb
+
+# Package build artifacts
+*.egg-info/
+dist/
+build/

@@ -3,7 +3,28 @@ from .power_lookup_tables import load_table
 from .grid_interpolation import clamp_index
 
 
-def estimate_energy(board, layer, in_dim, out_dim):
+def estimate_energy(
+    board: str,
+    layer: str,
+    in_dim: float | torch.Tensor,
+    out_dim: float | torch.Tensor,
+) -> torch.Tensor:
+    """Estimate energy for a single layer using bilinear interpolation.
+
+    Args:
+        board: Hardware board name (e.g. "JetsonNano").
+        layer: Layer key (e.g. "linear", "conv_k3_p0").
+        in_dim: Number of input channels/features.
+        out_dim: Number of output channels/features. Accepts a soft tensor
+            (e.g. mask.sum()) to keep the result differentiable.
+
+    Returns:
+        Scalar float64 tensor with estimated energy in Joules.
+        Differentiable with respect to out_dim when out_dim is a tensor.
+
+    Raises:
+        ValueError: If the lookup table has NaN near the requested dimensions.
+    """
 
     grid_x, grid_y, values = load_table(board, layer)
 

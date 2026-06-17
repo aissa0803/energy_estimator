@@ -5,7 +5,37 @@ from .layer_energy_interpolation import estimate_energy
 from .power_lookup_tables import resolve_layer_key
 
 
-def estimate_model_energy(model, board="CoralDevBoard", masks=None):
+def estimate_model_energy(
+    model: nn.Module,
+    board: str = "CoralDevBoard",
+    masks: dict[str, torch.Tensor] | None = None,
+) -> dict:
+    """Estimate the total energy consumption of a PyTorch model on a hardware board.
+
+    Iterates over the model's direct children layers, estimates the energy of
+    each supported layer using bilinear interpolation over measured power tables,
+    and returns a per-layer breakdown plus a differentiable total.
+
+    Args:
+        model: Any nn.Module whose direct children are nn.Linear or nn.Conv2d layers.
+        board: Target hardware board. Must match a folder in energy_estimator/data/.
+        masks: Optional dict mapping layer names to soft mask tensors (e.g. sigmoid
+            outputs). When provided, the effective output dimension is mask.sum()
+            instead of the full layer width, making the total energy differentiable
+            with respect to the mask scores.
+
+    Returns:
+        A dict with two keys:
+            - "layers": dict mapping each layer name to a sub-dict with keys:
+                type, layer_key, in, out, masked, energy (J), energy_mj (mJ).
+            - "total_energy": scalar float64 tensor, sum of all layer energies.
+                Differentiable when masks are provided.
+
+    Example:
+        >>> results = estimate_model_energy(model, board="JetsonNano")
+        >>> print(results["total_energy"])
+        >>> results["total_energy"].backward()  # works when masks are used
+    """
     if masks is None:
         masks = {}
 
