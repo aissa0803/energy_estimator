@@ -28,6 +28,7 @@ def clamp_index(
     hi_val = grid[hi]
     span = hi_val - lo_val
 
+    # t may go outside [0, 1] for linear extrapolation; gradient flows through x
     t = torch.where(
         span == 0,
         torch.zeros_like(x),

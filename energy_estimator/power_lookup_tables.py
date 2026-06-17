@@ -108,11 +108,6 @@ def load_table(board: str, layer_key: str) -> tuple[torch.Tensor, torch.Tensor, 
     zero_row = torch.zeros(1, values.shape[1], dtype=torch.float64)
     values = torch.cat([zero_row, values], dim=0)
     grid_x = torch.cat([torch.zeros(1, dtype=torch.float64), grid_x])
-    
-    
-    
-    
-    
 
     _TABLE_CACHE[key] = (grid_x, grid_y, values)
     return grid_x, grid_y, values
