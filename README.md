@@ -2,7 +2,7 @@
 
 A Python package for estimating the energy consumption of PyTorch neural network layers on embedded hardware boards (JetsonNano, CoralDevBoard).
 
-Designed for **neural network pruning workflows**: the energy estimate is fully differentiable, so it can be used directly as a loss term inside a training or optimization loop — gradients flow through the energy value back to the pruning masks.
+the energy estimate is fully differentiable, so it can be used directly as a loss term inside a training or optimization loop — gradients flow through the energy value back to the pruning masks.
 
 ## Supported Hardware
 
