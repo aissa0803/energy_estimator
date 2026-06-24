@@ -13,7 +13,7 @@ def estimate_energy(
 
     Args:
         board: Hardware board name (e.g. "JetsonNano").
-        layer: Layer key (e.g. "linear", "conv_k3_p0").
+        layer: Layer key (e.g. "linear", "conv_k3_s1_p0_d1").
         in_dim: Number of input channels/features.
         out_dim: Number of output channels/features. Accepts a soft tensor
             (e.g. mask.sum()) to keep the result differentiable.

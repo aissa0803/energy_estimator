@@ -14,15 +14,15 @@ def estimate_model_energy(
 
     Iterates over the model's direct children layers, estimates the energy of
     each supported layer using bilinear interpolation over measured power tables,
-    and returns a per-layer breakdown plus a differentiable total.
+    and returns a total energy and per-layer information.
 
     Args:
         model: Any nn.Module whose direct children are nn.Linear or nn.Conv2d layers.
         board: Target hardware board. Must match a folder in energy_estimator/data/.
         masks: Optional dict mapping layer names to soft mask tensors (e.g. sigmoid
             outputs). When provided, the effective output dimension is mask.sum()
-            instead of the full layer width, making the total energy differentiable
-            with respect to the mask scores.
+            instead of the full layer width. This effective output dimension is used
+            as the input dimension for the next layer.
 
     Returns:
         A dict with two keys:

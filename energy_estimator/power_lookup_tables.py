@@ -15,7 +15,7 @@ def resolve_layer_key(module: nn.Module) -> str | None:
         module: Any nn.Module instance.
 
     Returns:
-        A string key such as "linear" or "conv_k3_p0", or None if the
+        A string key such as "linear" or "conv_k3_s1_p0_d1", or None if the
         module type has no corresponding energy table.
     """
     if isinstance(module, nn.Linear):
@@ -23,10 +23,14 @@ def resolve_layer_key(module: nn.Module) -> str | None:
 
     if isinstance(module, nn.Conv2d):
         k = module.kernel_size
+        s = module.stride
         p = module.padding
+        d = module.dilation
         k = k[0] if isinstance(k, tuple) else k
+        s = s[0] if isinstance(s, tuple) else s
         p = p[0] if isinstance(p, tuple) else p
-        return f"conv_k{k}_p{p}"
+        d = d[0] if isinstance(d, tuple) else d
+        return f"conv_k{k}_s{s}_p{p}_d{d}"
 
     return None
 
@@ -43,7 +47,7 @@ def list_layer_keys(board: str) -> list[str]:
         board: Hardware board name (e.g. "JetsonNano").
 
     Returns:
-        Sorted list of layer keys (e.g. ["conv_k3_p0", "linear"]).
+        Sorted list of layer keys (e.g. ["conv_k3_s1_p0_d1", "linear"]).
     """
     board_dir = BASE_DIR / board
     return [
@@ -66,7 +70,7 @@ def load_table(board: str, layer_key: str) -> tuple[torch.Tensor, torch.Tensor, 
 
     Args:
         board: Hardware board name (e.g. "JetsonNano").
-        layer_key: Layer key (e.g. "linear", "conv_k3_p0").
+        layer_key: Layer key (e.g. "linear", "conv_k3_s1_p0_d1").
 
     Returns:
         grid_x: 1-D tensor of input dimension breakpoints.
