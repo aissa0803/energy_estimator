@@ -432,3 +432,21 @@ print(list_layer_keys("JetsonNano"))   # should include your new key
 | Existing board, new layer type | Add Excel file + branch in `resolve_layer_key` |
 | New board + new layer type | Both of the above |
 | Denser measurements for accuracy | Replace the Excel file; cache clears on next import |
+
+---
+
+## Contact
+
+| | |
+|---|---|
+| **Name** | Aissa ABDELAZIZ |
+| **Role** | Machine Learning Research Engineer |
+| **Institution** | Hi! Paris |
+| **Email** | [aissa.abdelaziz@ip-paris.fr](mailto:aissa.abdelaziz@ip-paris.fr) |
+
+**Supervisor**
+
+| | |
+|---|---|
+| **Name** | Prof. Enzo Tartaglione |
+| **Institution** | Telecom Paris |
